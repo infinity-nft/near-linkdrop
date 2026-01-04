@@ -8,8 +8,7 @@
 const CONFIG = {
     contractId: 'abhorrent-metal.testnet',
     networkId: 'testnet',
-    nodeUrl: 'http://localhost:8081/rpc',  // Local proxy
-    directRpcUrl: 'https://rpc.testnet.near.org',  // Direct RPC (fallback)
+    nodeUrl: '/api/rpc',  // Vercel serverless function
     explorerUrl: 'https://testnet.nearblocks.io',
     walletUrl: 'https://testnet.mynearwallet.com'
 };
