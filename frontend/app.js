@@ -8,7 +8,7 @@
 const CONFIG = {
     contractId: 'abhorrent-metal.testnet',
     networkId: 'testnet',
-    nodeUrl: 'https://rpc.testnet.pagoda.co',  // CORS-friendly endpoint
+    nodeUrl: 'https://test.rpc.fastnear.com',
     explorerUrl: 'https://testnet.nearblocks.io',
     walletUrl: 'https://testnet.mynearwallet.com'
 };
