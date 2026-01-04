@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Linkdrop — Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/near-api-js@3.0.4/dist/near-api-js.min.js"></script>
+    <style>
+        :root {
+            --bg: #0a0b0d;
+            --card: rgba(20, 22, 28, 0.95);
+            --primary: #00EC97;
+            --text: #fff;
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #00EC97, #00C3FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #00EC97, #00C3FF);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #0a0b0d;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .step-desc {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #00EC97, #00C3FF);
+            color: #0a0b0d;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(0, 236, 151, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .output-box {
+            background: rgba(0, 236, 151, 0.1);
+            border: 1px solid rgba(0, 236, 151, 0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .output-box h3 {
+            font-size: 0.875rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .output-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .output-row:last-child {
+            border: none;
+        }
+
+        .output-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .output-value {
+            font-family: monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+        }
+
+        .output-value a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .copy-btn {
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-top: 16px;
+            font-size: 0.875rem;
+        }
+
+        .status.info {
+            background: rgba(0, 195, 255, 0.1);
+            border: 1px solid rgba(0, 195, 255, 0.3);
+            color: #00C3FF;
+        }
+
+        .status.success {
+            background: rgba(0, 236, 151, 0.1);
+            border: 1px solid rgba(0, 236, 151, 0.3);
+            color: #00EC97;
+        }
+
+        .status.error {
+            background: rgba(255, 92, 92, 0.1);
+            border: 1px solid rgba(255, 92, 92, 0.3);
+            color: #FF5C5C;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .warning {
+            background: rgba(255, 184, 0, 0.1);
+            border: 1px solid rgba(255, 184, 0, 0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 0.875rem;
+            color: #FFB800;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔗 Create Linkdrop</h1>
+        <p class="subtitle">Generate a claimable link with NEAR tokens</p>
+
+        <div class="warning">
+            ⚠️ Для создания linkdrop потребуется ваш приватный ключ от аккаунта <code>abhorrent-metal.testnet</code>
+        </div>
+
+        <div class="card">
+            <!-- Step 1: Enter credentials -->
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <div class="step-title">Введите приватный ключ</div>
+                    <div class="step-desc">Приватный ключ от аккаунта-владельца контракта</div>
+
+                    <div class="input-group">
+                        <label>Private Key (ed25519:...)</label>
+                        <input type="password" id="senderPrivateKey" placeholder="ed25519:...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Amount -->
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <div class="step-title">Сумма для отправки</div>
+                    <div class="step-desc">Сколько NEAR отправить в linkdrop</div>
+
+                    <div class="input-group">
+                        <label>Amount (NEAR)</label>
+                        <input type="number" id="amountInput" value="0.5" min="0.01" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Create -->
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <div class="step-title">Создать Linkdrop</div>
+                    <div class="step-desc">Будет сгенерирован новый ключ и создан linkdrop</div>
+
+                    <button class="btn" id="createBtn" onclick="createLinkdrop()">
+                        ✨ Создать Linkdrop
+                    </button>
+                </div>
+            </div>
+
+            <div id="status" class="status hidden"></div>
+        </div>
+
+        <!-- Result -->
+        <div id="resultCard" class="card hidden">
+            <div class="output-box">
+                <h3>✅ Linkdrop создан!</h3>
+
+                <div class="output-row">
+                    <span class="output-label">Сумма</span>
+                    <span class="output-value" id="resultAmount">0.5 NEAR</span>
+                </div>
+
+                <div class="output-row">
+                    <span class="output-label">Ссылка для клейма</span>
+                    <span class="output-value">
+                        <a id="claimLink" href="#" target="_blank">Открыть →</a>
+                    </span>
+                </div>
+
+                <div class="output-row">
+                    <span class="output-label">Transaction</span>
+                    <span class="output-value">
+                        <a id="txLink" href="#" target="_blank">View on Explorer →</a>
+                    </span>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 20px;">
+                <label>Полная ссылка (скопируйте и отправьте получателю)</label>
+                <textarea id="fullClaimUrl" readonly onclick="this.select()"></textarea>
+            </div>
+
+            <button class="btn copy-btn" onclick="copyClaimUrl()">📋 Скопировать ссылку</button>
+        </div>
+
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.75rem; margin-top: 24px;">
+            Contract: abhorrent-metal.testnet
+        </p>
+    </div>
+
+    <script>
+        const CONFIG = {
+            contractId: 'abhorrent-metal.testnet',
+            networkId: 'testnet',
+            nodeUrl: 'https://rpc.testnet.near.org',
+            explorerUrl: 'https://testnet.nearblocks.io'
+        };
+
+        async function createLinkdrop() {
+            const btn = document.getElementById('createBtn');
+            const status = document.getElementById('status');
+            const resultCard = document.getElementById('resultCard');
+
+            const senderKey = document.getElementById('senderPrivateKey').value.trim();
+            const amount = document.getElementById('amountInput').value;
+
+            if (!senderKey) {
+                showStatus('Введите приватный ключ', 'error');
+                return;
+            }
+
+            if (!amount || parseFloat(amount) <= 0) {
+                showStatus('Введите корректную сумму', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            showStatus('Генерация ключей...', 'info');
+
+            try {
+                // Generate new keypair for linkdrop
+                const linkdropKeyPair = nearApi.KeyPair.fromRandom('ed25519');
+                const linkdropPublicKey = linkdropKeyPair.getPublicKey().toString();
+                const linkdropPrivateKey = linkdropKeyPair.toString();
+
+                showStatus('Подключение к NEAR...', 'info');
+
+                // Setup sender connection
+                const senderKeyPair = nearApi.KeyPair.fromString(senderKey);
+                const keyStore = new nearApi.keyStores.InMemoryKeyStore();
+                await keyStore.setKey(CONFIG.networkId, CONFIG.contractId, senderKeyPair);
+
+                const near = await nearApi.connect({
+                    networkId: CONFIG.networkId,
+                    keyStore: keyStore,
+                    nodeUrl: CONFIG.nodeUrl
+                });
+
+                showStatus('Отправка транзакции...', 'info');
+
+                const account = await near.account(CONFIG.contractId);
+
+                // Convert NEAR to yoctoNEAR
+                const amountYocto = nearApi.utils.format.parseNearAmount(amount);
+
+                // Call send method
+                const result = await account.functionCall({
+                    contractId: CONFIG.contractId,
+                    methodName: 'send',
+                    args: { public_key: linkdropPublicKey },
+                    gas: '100000000000000', // 100 TGas
+                    attachedDeposit: amountYocto
+                });
+
+                // Build claim URL
+                const claimUrl = `${window.location.origin}/?key=${encodeURIComponent(linkdropPrivateKey)}`;
+
+                // Show result
+                document.getElementById('resultAmount').textContent = `${amount} NEAR`;
+                document.getElementById('claimLink').href = claimUrl;
+                document.getElementById('txLink').href = `${CONFIG.explorerUrl}/txns/${result.transaction.hash}`;
+                document.getElementById('fullClaimUrl').value = claimUrl;
+
+                resultCard.classList.remove('hidden');
+                showStatus('Linkdrop создан успешно!', 'success');
+
+                console.log('Linkdrop created!');
+                console.log('Public Key:', linkdropPublicKey);
+                console.log('Private Key:', linkdropPrivateKey);
+                console.log('Transaction:', result.transaction.hash);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`Ошибка: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.classList.remove('hidden');
+        }
+
+        function copyClaimUrl() {
+            const textarea = document.getElementById('fullClaimUrl');
+            textarea.select();
+            document.execCommand('copy');
+
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Скопировано!';
+            setTimeout(() => btn.textContent = originalText, 2000);
+        }
+    </script>
+</body>
+
+</html>
