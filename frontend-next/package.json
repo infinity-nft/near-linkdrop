@@ -10,11 +10,12 @@
   },
   "dependencies": {
     "@near-pagoda/ui": "^3.2.3",
+    "@phosphor-icons/react": "^2.1.10",
     "near-api-js": "^6.5.1",
     "next": "16.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "zustand": "^5.0.9"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
